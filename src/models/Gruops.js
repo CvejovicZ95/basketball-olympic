@@ -30,13 +30,20 @@ class Group {
     const formB = calculateForm(teamB.isoCode, this.exhibitionsData);
     
     const baseScore = 80;
+    
+    // Izračunavanje bonus bodova na osnovu FIBA ranga
+    const maxFIBARank = Math.min(...this.teams.map(team => team.fibaRanking));
+    const rankRange = maxFIBARank - Math.min(...this.teams.map(team => team.fibaRanking)) + 1;
 
-    let pointsA = baseScore + formA + Math.floor(Math.random() * 10) - 5;
-    let pointsB = baseScore + formB + Math.floor(Math.random() * 10) - 5;
+    const rankBonusA = Math.max(0, 10 - ((teamA.fibaRanking - 1) / rankRange) * 10);
+    const rankBonusB = Math.max(0, 10 - ((teamB.fibaRanking - 1) / rankRange) * 10);
+
+    let pointsA = baseScore + formA + Math.floor(Math.random() * 10) - 5 + rankBonusA;
+    let pointsB = baseScore + formB + Math.floor(Math.random() * 10) - 5 + rankBonusB;
 
     while (pointsA === pointsB) {
-      pointsA = baseScore + formA + Math.floor(Math.random() * 10) - 5;
-      pointsB = baseScore + formB + Math.floor(Math.random() * 10) - 5;
+      pointsA = baseScore + formA + Math.floor(Math.random() * 10) - 5 + rankBonusA;
+      pointsB = baseScore + formB + Math.floor(Math.random() * 10) - 5 + rankBonusB;
     }
 
     return {
@@ -76,7 +83,5 @@ class Group {
     return this.matches;
   }
 }
-
-
 
 module.exports = Group;

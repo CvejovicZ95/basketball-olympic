@@ -1,9 +1,9 @@
 // index.js
 
 const Group = require('./src/models/Gruops');
+const Quarterfinals = require('./src/models//QuarterFinal');
 const { loadGroupsData, loadExhibitionsData } = require('./src/utils/dataLoader');
 const { rankTeams, assignRanks } = require('./src/utils/ranking');
-const { generateQuarterFinals } = require('./src/models/QuarterFinals');
 
 // Učitaj podatke iz JSON fajlova
 const groupsData = loadGroupsData();
@@ -59,19 +59,12 @@ rankedTeams.forEach(team => {
 
 console.log('----------')
 
-const pots = {
-  D: rankedTeams.filter(team => team.rank === '1' || team.rank === '2'),
-  E: rankedTeams.filter(team => team.rank === '3' || team.rank === '4'),
-  F: rankedTeams.filter(team => team.rank === '5' || team.rank === '6'),
-  G: rankedTeams.filter(team => team.rank === '7' || team.rank === '8')
-};
+const quarterfinals = new Quarterfinals(rankedTeams, exhibitionsData);
+quarterfinals.playQuarterfinals();
 
-// Generisanje parova četvrtfinala
-const quarterFinals = generateQuarterFinals(pots);
-
-console.log('Parovi četvrtfinala:');
-quarterFinals.forEach(match => {
-  //console.log('DEBUG:', match); // Debug line to show the whole match object
-  console.log(`${match.match}: ${match.teamA.name} vs ${match.teamB.name}`);
+// Display quarterfinal results
+console.log('Quarterfinal Results:');
+quarterfinals.getResults().forEach(match => {
+  console.log(`Match ${match.matchNumber}: ${match.teamA} vs ${match.teamB} - Result: ${match.result} | Winner: ${match.winner}`);
 });
 
