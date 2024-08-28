@@ -71,6 +71,12 @@ class Group {
       thirdPlace: standings[2]
     };
   }
+
+  getGames() {
+    return this.matches;
+  }
 }
+
+
 
 module.exports = Group;

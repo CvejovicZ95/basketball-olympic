@@ -3,7 +3,7 @@
 const Group = require('./src/models/Gruops');
 const { loadGroupsData, loadExhibitionsData } = require('./src/utils/dataLoader');
 const { rankTeams, assignRanks } = require('./src/utils/ranking');
-
+const { generateQuarterFinals } = require('./src/models/QuarterFinals');
 
 // Učitaj podatke iz JSON fajlova
 const groupsData = loadGroupsData();
@@ -49,10 +49,29 @@ const sortedTeams = rankTeams(allTeams);
 
 // Dodeli rangove i ispiši rezultate za prolaz dalje
 const rankedTeams = assignRanks(sortedTeams);
-console.log('Prvih 8 timova sa spiska idu u cetvrt-finale:')
+console.log('8 timova sa spiska idu u cetvrt-finale:')
 console.log('----------')
 console.log('(broj bodova/postignuti koševi/primljeni koševi/koš razlika)')
 console.log('----------')
 rankedTeams.forEach(team => {
   console.log(`${team.rank}: ${team.name} (${team.points} / ${team.pointsFor} / ${team.pointsAgainst} / ${team.pointDifference})`);
 });
+
+console.log('----------')
+
+const pots = {
+  D: rankedTeams.filter(team => team.rank === '1' || team.rank === '2'),
+  E: rankedTeams.filter(team => team.rank === '3' || team.rank === '4'),
+  F: rankedTeams.filter(team => team.rank === '5' || team.rank === '6'),
+  G: rankedTeams.filter(team => team.rank === '7' || team.rank === '8')
+};
+
+// Generisanje parova četvrtfinala
+const quarterFinals = generateQuarterFinals(pots);
+
+console.log('Parovi četvrtfinala:');
+quarterFinals.forEach(match => {
+  //console.log('DEBUG:', match); // Debug line to show the whole match object
+  console.log(`${match.match}: ${match.teamA.name} vs ${match.teamB.name}`);
+});
+

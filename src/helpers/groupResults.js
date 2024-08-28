@@ -2,7 +2,6 @@
 
 function hasPlayed(groupResults, team1, team2) {
   console.log('Proveravam:', team1, team2);
-  console.log('Rezultati grupa:', groupResults);
   
   if (!groupResults) {
     console.error('Rezultati grupa nisu pronađeni.');
