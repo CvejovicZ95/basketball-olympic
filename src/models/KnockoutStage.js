@@ -110,67 +110,93 @@ class Tournament {
   }
 
   playQuarterfinals() {
-    const firstSeed = this.teams.slice(0, 2); // Teams 1 and 2
-    const secondSeed = this.teams.slice(2, 4); // Teams 3 and 4
-    const thirdSeed = this.teams.slice(4, 6); // Teams 5 and 6
-    const fourthSeed = this.teams.slice(6);   // Teams 7 and 8
-  
-    // Shuffling seeds
-    const shuffledFirstSeed = shuffleArray([...firstSeed]);
-    const shuffledSecondSeed = shuffleArray([...secondSeed]);
-    const shuffledThirdSeed = shuffleArray([...thirdSeed]);
-    const shuffledFourthSeed = shuffleArray([...fourthSeed]);
-  
-    // Function to find a valid opponent for a given team
-    function findValidOpponent(seedTeam, opponents, usedMatchups) {
-      const validOpponents = opponents.filter(opponent => 
-        !havePlayedBefore(seedTeam.name, opponent.name) && 
-        !usedMatchups.some(match => 
-          (match[0].name === seedTeam.name && match[1].name === opponent.name) ||
-          (match[0].name === opponent.name && match[1].name === seedTeam.name)
-        )
-      );
-      console.log(`Validni protivnici za ${seedTeam.name}:`, validOpponents.map(opponent => opponent.name));
-      if (validOpponents.length === 0) {
-        throw new Error(`Nema validnog protivnika za tim ${seedTeam.name}.`);
-      }
-      return validOpponents[Math.floor(Math.random() * validOpponents.length)];
-    }
-  
-    const usedMatchups = [];
-    
-    const matchups = [
-      [shuffledFirstSeed[0], findValidOpponent(shuffledFirstSeed[0], shuffledFourthSeed, usedMatchups)],
-      [shuffledFirstSeed[1], findValidOpponent(shuffledFirstSeed[1], shuffledFourthSeed, usedMatchups)],
-      [shuffledSecondSeed[0], findValidOpponent(shuffledSecondSeed[0], shuffledThirdSeed, usedMatchups)],
-      [shuffledSecondSeed[1], findValidOpponent(shuffledSecondSeed[1], shuffledThirdSeed, usedMatchups)]
-    ];
+    const firstSeed = this.teams.slice(0, 2); // Timovi 1 i 2
+    const secondSeed = this.teams.slice(2, 4); // Timovi 3 i 4
+    const thirdSeed = this.teams.slice(4, 6); // Timovi 5 i 6
+    const fourthSeed = this.teams.slice(6);   // Timovi 7 i 8
 
-    // Ensure that the matchups list does not contain duplicate matches
-    matchups.forEach(match => usedMatchups.push(match));
-    
+    const usedTeams = [];
+    const matchups = [];
+
+    // Funkcija za pronalaženje validnog protivnika za tim sa jednim protivnikom
+    function findSingleOpponent(seedTeam, opponents) {
+        const validOpponents = opponents.filter(opponent => 
+            !havePlayedBefore(seedTeam.name, opponent.name) &&
+            !usedTeams.includes(opponent.name)
+        );
+        if (validOpponents.length === 1) {
+            return validOpponents[0];
+        }
+        return null;
+    }
+
+    // Prvo uparivanje timova sa jednim validnim protivnikom
+    firstSeed.forEach(team => {
+        const opponent = findSingleOpponent(team, fourthSeed);
+        if (opponent) {
+            matchups.push([team, opponent]);
+            usedTeams.push(team.name, opponent.name);
+        }
+    });
+
+    secondSeed.forEach(team => {
+        const opponent = findSingleOpponent(team, thirdSeed);
+        if (opponent) {
+            matchups.push([team, opponent]);
+            usedTeams.push(team.name, opponent.name);
+        }
+    });
+
+    // Uparivanje preostalih timova
+    function findRemainingMatchups(seed, opponents) {
+        seed.forEach(team => {
+            if (!usedTeams.includes(team.name)) {
+                const remainingOpponents = opponents.filter(opponent => 
+                    !usedTeams.includes(opponent.name) && !havePlayedBefore(team.name, opponent.name)
+                );
+                if (remainingOpponents.length > 0) {
+                    const opponent = remainingOpponents[Math.floor(Math.random() * remainingOpponents.length)];
+                    matchups.push([team, opponent]);
+                    usedTeams.push(team.name, opponent.name);
+                } else {
+                    throw new Error(`Nema validnog protivnika za tim ${team.name}.`);
+                }
+            }
+        });
+    }
+
+    findRemainingMatchups(firstSeed, fourthSeed);
+    findRemainingMatchups(secondSeed, thirdSeed);
+
+    if (matchups.length !== 4) {
+        throw new Error('Ne mogu da pronađem sve validne kombinacije mečeva.');
+    }
+
     console.log("Četvrtfinalne utakmice:");
     matchups.forEach((match, index) => {
-      const [teamA, teamB] = match;
-      console.log(`Match ${index + 1}: ${teamA.name} vs ${teamB.name}`);
+        const [teamA, teamB] = match;
+        console.log(`Match ${index + 1}: ${teamA.name} vs ${teamB.name}`);
     });
-  
+
     matchups.forEach((match, index) => {
-      const [teamA, teamB] = match;
-      try {
-        const result = this.simulateMatch(teamA, teamB);
-        this.matches.push({
-          matchNumber: index + 1,
-          teamA: teamA.name,
-          teamB: teamB.name,
-          result: `${result.pointsFor}:${result.pointsAgainst}`,
-          winner: result.winner.name
-        });
-      } catch (error) {
-        console.error(`Greška prilikom simulacije meča ${index + 1}: ${error.message}`);
-      }
+        const [teamA, teamB] = match;
+        try {
+            const result = this.simulateMatch(teamA, teamB);
+            this.matches.push({
+                matchNumber: index + 1,
+                teamA: teamA.name,
+                teamB: teamB.name,
+                result: `${result.pointsFor}:${result.pointsAgainst}`,
+                winner: result.winner.name
+            });
+        } catch (error) {
+            console.error(`Greška prilikom simulacije meča ${index + 1}: ${error.message}`);
+        }
     });
 }
+
+
+
   
   
 
