@@ -200,38 +200,53 @@ class Tournament {
   
   
 
-  playSemifinals() {
-    if (this.matches.length !== 4) {
+playSemifinals() {
+  if (this.matches.length !== 4) {
       throw new Error('There should be 4 quarterfinal matches to proceed to semifinals.');
-    }
-
-    // Preuzmite pobednike iz četvrtfinala
-    const semifinalTeams = this.matches.map(match => ({
-      name: match.winner
-    }));
-
-    // Nasumično pomešajte timove za polufinale
-    const shuffledSemifinalTeams = shuffleArray([...semifinalTeams]);
-
-    // Razdelite timove na polufinalne parove
-    const semifinalMatchups = [
-      [shuffledSemifinalTeams[0], shuffledSemifinalTeams[1]],
-      [shuffledSemifinalTeams[2], shuffledSemifinalTeams[3]]
-    ];
-
-    semifinalMatchups.forEach((match, index) => {
-      const [teamA, teamB] = match;
-      const result = this.simulateMatch(teamA, teamB);
-      this.matches.push({
-        stage: 'Semifinals',
-        matchNumber: index + 1,
-        teamA: teamA.name,
-        teamB: teamB.name,
-        result: `${result.pointsFor}:${result.pointsAgainst}`,
-        winner: result.winner.name
-      });
-    });
   }
+
+  // Pobednici četvrtfinala
+  const quarterfinalWinners = this.matches.map(match => match.winner);
+  
+  // Originalni šeširi
+  const firstSeed = this.teams.slice(0, 2).map(team => team.name); // Timovi 1 i 2
+  const secondSeed = this.teams.slice(2, 4).map(team => team.name); // Timovi 3 i 4
+  const thirdSeed = this.teams.slice(4, 6).map(team => team.name); // Timovi 5 i 6
+  const fourthSeed = this.teams.slice(6).map(team => team.name);   // Timovi 7 i 8
+
+  // Delimo timove pobednike prema šeširima
+  const winnersFromFirstAndFourthSeed = quarterfinalWinners.filter(winner => 
+      firstSeed.includes(winner) || fourthSeed.includes(winner)
+  );
+
+  const winnersFromSecondAndThirdSeed = quarterfinalWinners.filter(winner => 
+      secondSeed.includes(winner) || thirdSeed.includes(winner)
+  );
+
+  if (winnersFromFirstAndFourthSeed.length !== 2 || winnersFromSecondAndThirdSeed.length !== 2) {
+      throw new Error('Invalid semifinal pairing due to improper seeding.');
+  }
+
+  // Formiramo polufinalne parove ukrštanjem šešira
+  const semifinalMatchups = [
+      [winnersFromFirstAndFourthSeed[0], winnersFromSecondAndThirdSeed[0]],
+      [winnersFromFirstAndFourthSeed[1], winnersFromSecondAndThirdSeed[1]]
+  ];
+
+  semifinalMatchups.forEach((match, index) => {
+      const [teamA, teamB] = match;
+      const result = this.simulateMatch({ name: teamA }, { name: teamB });
+      this.matches.push({
+          stage: 'Semifinals',
+          matchNumber: index + 1,
+          teamA: teamA,
+          teamB: teamB,
+          result: `${result.pointsFor}:${result.pointsAgainst}`,
+          winner: result.winner.name
+      });
+  });
+}
+
 
   playFinals() {
     if (this.matches.length !== 6) {
