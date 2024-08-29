@@ -4,14 +4,14 @@ function hasPlayed(groupResults, team1, team2) {
   console.log('Proveravam:', team1, team2);
   
   if (!groupResults) {
-    console.error('Rezultati grupa nisu pronađeni.');
+    console.log('Rezultati grupa nisu pronađeni.');
     return false;
   }
 
   for (const groupName in groupResults) {
     const group = groupResults[groupName];
     if (!group.matches) {
-      console.error(`Nema utakmica za grupu ${groupName}.`);
+      console.log(`Nema utakmica za grupu ${groupName}.`);
       continue;
     }
 
