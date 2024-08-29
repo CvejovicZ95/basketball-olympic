@@ -1,6 +1,6 @@
 function calculateForm(teamISOCode, exhibitionsData) {
   const results = exhibitionsData[teamISOCode];
-  
+
   if (!results || results.length === 0) {
     return 0;
   }
@@ -8,10 +8,10 @@ function calculateForm(teamISOCode, exhibitionsData) {
   let totalPointDifference = 0;
   let wins = 0;
 
-  results.forEach(match => {
-    const [teamPoints, opponentPoints] = match.Result.split('-').map(Number);
+  results.forEach((match) => {
+    const [teamPoints, opponentPoints] = match.Result.split("-").map(Number);
 
-    totalPointDifference += (teamPoints - opponentPoints);
+    totalPointDifference += teamPoints - opponentPoints;
 
     if (teamPoints > opponentPoints) {
       wins++;
@@ -21,7 +21,7 @@ function calculateForm(teamISOCode, exhibitionsData) {
   const averagePointDifference = totalPointDifference / results.length;
   const winBonus = wins * 5;
 
-  const formBonus = Math.floor((averagePointDifference / 10) + winBonus);
+  const formBonus = Math.floor(averagePointDifference / 10 + winBonus);
 
   return formBonus;
 }
