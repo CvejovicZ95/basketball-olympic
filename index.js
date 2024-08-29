@@ -1,15 +1,12 @@
-// index.js
-
 const Group = require('./src/models/Gruops');
 const Tournament = require('./src/models/KnockoutStage');
 const { loadGroupsData, loadExhibitionsData } = require('./src/utils/dataLoader');
 const { rankTeams, assignRanks } = require('./src/utils/ranking');
 
-// Učitaj podatke iz JSON fajlova
 const groupsData = loadGroupsData();
 const exhibitionsData = loadExhibitionsData();
 
-// Kreiraj i prikaži grupnu fazu
+// create and show gruop phase
 const groups = Object.keys(groupsData).map(groupName => {
   return new Group(groupName, groupsData[groupName], exhibitionsData);
 });
@@ -44,10 +41,10 @@ groups.forEach(group => {
   });
 });
 
-// Rangiraj sve timove iz grupa A, B i C
+// Rank teams from all gruops
 const sortedTeams = rankTeams(allTeams);
 
-// Dodeli rangove i ispiši rezultate za prolaz dalje
+// Results and who went to knockout
 const rankedTeams = assignRanks(sortedTeams);
 console.log('8 timova sa spiska idu u cetvrt-finale:')
 console.log('----------')
@@ -62,41 +59,42 @@ console.log('----------')
 const quarterfinals = new Tournament(rankedTeams, exhibitionsData);
 quarterfinals.playQuarterfinals();
 
-// Prikaz rezultata četvrtfinala
-console.log('Cetvrt-finale:');
+// Quarter-finals results
+console.log('Četvrt-finale:');
 quarterfinals.getResults().quarterfinals.forEach(match => {
   console.log(`${match.matchNumber}: ${match.teamA} vs ${match.teamB} - Rezultat: ${match.result} | Pobednik: ${match.winner}`);
 });
 console.log('----------');
 
-// Odigraj polufinale
+// play semi-finals
 quarterfinals.playSemifinals();
 
-// Prikaz rezultata polufinala
+// Semi-finals results
 console.log('Polufinale:');
 quarterfinals.getResults().semifinals.forEach(match => {
   console.log(`${match.matchNumber}: ${match.teamA} vs ${match.teamB} - Rezultat: ${match.result} | Pobednik: ${match.winner}`);
 });
 console.log('----------');
 
+// play finals
 quarterfinals.playFinals();
 
-// Prikaz rezultata finala
+// Finals results
 const finalResult = quarterfinals.getResults().final;
 console.log('Finale:');
 console.log(`1. ${finalResult.teamA} vs ${finalResult.teamB} - Rezultat: ${finalResult.result} | Pobednik: ${finalResult.winner}`);
 console.log('----------');
 
-// Odigraj utakmicu za treće mesto
+// play for 3rd place
 quarterfinals.playThirdPlaceMatch();
 
-// Prikaz rezultata utakmice za treće mesto
+// 3rd place results
 const thirdPlaceResult = quarterfinals.getResults().thirdPlace;
 console.log('Utakmica za treće mesto:');
 console.log(`1. ${thirdPlaceResult.teamA} vs ${thirdPlaceResult.teamB} - Rezultat: ${thirdPlaceResult.result} | Pobednik: ${thirdPlaceResult.winner}`);
 console.log('----------');
 
-// Prikaz medalja
+// Medals
 const finalWinner = finalResult.winner;
 const secondPlace = finalResult.winner === finalResult.teamA ? finalResult.teamB : finalResult.teamA;
 const thirdPlace = thirdPlaceResult.winner;

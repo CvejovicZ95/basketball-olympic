@@ -2,11 +2,9 @@ const { calculateForm } = require('../utils/form');
 const fs = require('fs');
 const path = require('path');
 
-// Učitajte grupu i ranking podatke iz JSON fajla
 const groupsFilePath = path.join(__dirname, '../../data/groups.json');
 const groupsData = JSON.parse(fs.readFileSync(groupsFilePath, 'utf8'));
 
-// Funkcija za dobijanje FIBA rankinga tima na osnovu imena tima
 function getFIBARanking(teamName) {
   for (const group in groupsData) {
     const team = groupsData[group].find(team => team.Team === teamName);
@@ -14,13 +12,12 @@ function getFIBARanking(teamName) {
       return team.FIBARanking;
     }
   }
-  return null; // Ako tim nije pronađen
+  return null;
 }
 
 function havePlayedBefore(teamA, teamB) {
-  // Predefinisani podaci o grupnim mečevima
   const groupMatches = [
-    // Grupa A
+    // Matches from gruop A
     ["Kanada", "Australija"],
     ["Kanada", "Grčka"],
     ["Kanada", "Španija"],
@@ -28,7 +25,7 @@ function havePlayedBefore(teamA, teamB) {
     ["Australija", "Španija"],
     ["Grčka", "Španija"],
     
-    // Grupa B
+    //Matches from gruop B
     ["Nemačka", "Francuska"],
     ["Nemačka", "Brazil"],
     ["Nemačka", "Japan"],
@@ -36,7 +33,7 @@ function havePlayedBefore(teamA, teamB) {
     ["Francuska", "Japan"],
     ["Brazil", "Japan"],
     
-    // Grupa C
+    // Matches from gruop C
     ["Sjedinjene Države", "Srbija"],
     ["Sjedinjene Države", "Južni Sudan"],
     ["Sjedinjene Države", "Puerto Riko"],
@@ -47,17 +44,6 @@ function havePlayedBefore(teamA, teamB) {
 
   return groupMatches.some(match => (match[0] === teamA && match[1] === teamB) || (match[0] === teamB && match[1] === teamA));
 }
-
-
-// Funkcija za nasumično mešanje elemenata u nizu
-function shuffleArray(array) {
-  for (let i = array.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [array[i], array[j]] = [array[j], array[i]]; // Swap elements
-  }
-  return array;
-}
-
 class Tournament {
   constructor(teams, exhibitionsData) {
     if (teams.length !== 8) {
@@ -78,7 +64,6 @@ class Tournament {
 
     const baseScore = 80;
 
-    // Dobijanje FIBA rankinga za timove koristeći nazive timova
     const rankingA = getFIBARanking(teamA.name);
     const rankingB = getFIBARanking(teamB.name);
 
@@ -86,7 +71,6 @@ class Tournament {
       throw new Error('FIBA ranking not found for one of the teams');
     }
 
-    // Veći rang znači veći bonus, na primer, rang može biti korišćen kao bonus
     const bonusA = 25 - rankingA;
     const bonusB = 25 - rankingB;
 
@@ -110,15 +94,15 @@ class Tournament {
   }
 
   playQuarterfinals() {
-    const firstSeed = this.teams.slice(0, 2); // Timovi 1 i 2
-    const secondSeed = this.teams.slice(2, 4); // Timovi 3 i 4
-    const thirdSeed = this.teams.slice(4, 6); // Timovi 5 i 6
-    const fourthSeed = this.teams.slice(6);   // Timovi 7 i 8
+    const firstSeed = this.teams.slice(0, 2); 
+    const secondSeed = this.teams.slice(2, 4);
+    const thirdSeed = this.teams.slice(4, 6);
+    const fourthSeed = this.teams.slice(6); 
 
     const usedTeams = [];
     const matchups = [];
 
-    // Funkcija za pronalaženje validnog protivnika za tim sa jednim protivnikom
+    // function to find valid opponent
     function findSingleOpponent(seedTeam, opponents) {
         const validOpponents = opponents.filter(opponent => 
             !havePlayedBefore(seedTeam.name, opponent.name) &&
@@ -130,7 +114,7 @@ class Tournament {
         return null;
     }
 
-    // Prvo uparivanje timova sa jednim validnim protivnikom
+    // paring valid opponents
     firstSeed.forEach(team => {
         const opponent = findSingleOpponent(team, fourthSeed);
         if (opponent) {
@@ -147,7 +131,7 @@ class Tournament {
         }
     });
 
-    // Uparivanje preostalih timova
+    // paring other opponents
     function findRemainingMatchups(seed, opponents) {
         seed.forEach(team => {
             if (!usedTeams.includes(team.name)) {
@@ -172,11 +156,13 @@ class Tournament {
         throw new Error('Ne mogu da pronađem sve validne kombinacije mečeva.');
     }
 
-    console.log("Četvrtfinalne utakmice:");
+    console.log("Četvrtfinalni parovi:");
     matchups.forEach((match, index) => {
         const [teamA, teamB] = match;
-        console.log(`Match ${index + 1}: ${teamA.name} vs ${teamB.name}`);
+        console.log(`${index + 1}: ${teamA.name} vs ${teamB.name}`);
     });
+
+    console.log('----------');
 
     matchups.forEach((match, index) => {
         const [teamA, teamB] = match;
@@ -195,26 +181,22 @@ class Tournament {
     });
 }
 
-
-
-  
-  
-
 playSemifinals() {
   if (this.matches.length !== 4) {
-      throw new Error('There should be 4 quarterfinal matches to proceed to semifinals.');
+      throw new Error('Potrebno je da postoje 4 odigrana meca.');
   }
 
-  // Pobednici četvrtfinala
+  // quarter-finals winners
   const quarterfinalWinners = this.matches.map(match => match.winner);
   
-  // Originalni šeširi
-  const firstSeed = this.teams.slice(0, 2).map(team => team.name); // Timovi 1 i 2
-  const secondSeed = this.teams.slice(2, 4).map(team => team.name); // Timovi 3 i 4
-  const thirdSeed = this.teams.slice(4, 6).map(team => team.name); // Timovi 5 i 6
-  const fourthSeed = this.teams.slice(6).map(team => team.name);   // Timovi 7 i 8
+  // original pots for teams
+  const firstSeed = this.teams.slice(0, 2).map(team => team.name); 
+  const secondSeed = this.teams.slice(2, 4).map(team => team.name);
 
-  // Delimo timove pobednike prema šeširima
+  const thirdSeed = this.teams.slice(4, 6).map(team => team.name); 
+  const fourthSeed = this.teams.slice(6).map(team => team.name); 
+
+  // divide the winning teams according to the pots
   const winnersFromFirstAndFourthSeed = quarterfinalWinners.filter(winner => 
       firstSeed.includes(winner) || fourthSeed.includes(winner)
   );
@@ -227,7 +209,7 @@ playSemifinals() {
       throw new Error('Invalid semifinal pairing due to improper seeding.');
   }
 
-  // Formiramo polufinalne parove ukrštanjem šešira
+  // form semi-final pairs by crossing pots
   const semifinalMatchups = [
       [winnersFromFirstAndFourthSeed[0], winnersFromSecondAndThirdSeed[0]],
       [winnersFromFirstAndFourthSeed[1], winnersFromSecondAndThirdSeed[1]]
@@ -250,7 +232,7 @@ playSemifinals() {
 
   playFinals() {
     if (this.matches.length !== 6) {
-      throw new Error('There should be 2 semifinals matches to proceed to finals.');
+      throw new Error('Trebalo bi da postoji 2 polufinalna meca.');
     }
 
     const finalTeams = this.matches
@@ -260,7 +242,7 @@ playSemifinals() {
       }));
 
     if (finalTeams.length !== 2) {
-      throw new Error('There should be exactly 2 teams for the final.');
+      throw new Error('Trebalo bi da bude tacno 2 tima u finalu.');
     }
 
     const [teamA, teamB] = finalTeams;
@@ -277,7 +259,7 @@ playSemifinals() {
 
   playThirdPlaceMatch() {
     if (this.matches.length !== 7) {
-      throw new Error('There should be 1 final match to proceed to third place match.');
+      throw new Error('Treba da postoji 1 finalni mec da bi se odigrao mec za trece mesto.');
     }
 
     const semifinalLosers = this.matches
@@ -287,7 +269,7 @@ playSemifinals() {
       }));
 
     if (semifinalLosers.length !== 2) {
-      throw new Error('There should be exactly 2 teams for the third place match.');
+      throw new Error('Trebalo bi da postoje 2 tima da igraju za trece mesto.');
     }
 
     const [teamA, teamB] = semifinalLosers;

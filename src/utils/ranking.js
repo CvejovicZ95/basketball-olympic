@@ -1,5 +1,3 @@
-// src/utils/ranking.js
-
 function rankTeams(teams) {
   return teams.sort((a, b) => {
       if (a.points !== b.points) return b.points - a.points;

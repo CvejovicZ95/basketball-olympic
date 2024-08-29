@@ -31,7 +31,7 @@ class Group {
     
     const baseScore = 80;
     
-    // Izračunavanje bonus bodova na osnovu FIBA ranga
+    // calculating bonus from FIBA ranks
     const maxFIBARank = Math.min(...this.teams.map(team => team.fibaRanking));
     const rankRange = maxFIBARank - Math.min(...this.teams.map(team => team.fibaRanking)) + 1;
 
