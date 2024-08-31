@@ -121,7 +121,7 @@ class Tournament {
       return null;
     }
 
-    // paring valid opponents
+    // pairing valid opponents
     firstSeed.forEach((team) => {
       const opponent = findSingleOpponent(team, fourthSeed);
       if (opponent) {
@@ -138,7 +138,7 @@ class Tournament {
       }
     });
 
-    // paring other opponents
+    // pairing other opponents
     function findRemainingMatchups(seed, opponents) {
       seed.forEach((team) => {
         if (!usedTeams.includes(team.name)) {
