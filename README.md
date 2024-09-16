@@ -12,7 +12,7 @@ This project simulates a basketball tournament in the Olympic Games using vanill
     1 point for a loss,
     0 points for a forfeit
 - Teams in the group are ranked by total points. If two teams have the same number of points, the result of their head-to-head match determines their ranking. If three teams are tied, the ranking is based on the point difference in their head-to-head matches (forming a "circle").
-- 
+  
 - At the end of the group stage, the top three teams in each group are ranked from 1 to 9 as follows:
 
 - The top teams from groups A, B, and C are ranked based on points, point difference (in case of a tie), and total points scored (in case of a further tie) to assign ranks 1, 2, and 3.
@@ -22,21 +22,18 @@ The teams ranked from 1 to 8 advance to the knockout stage, while the 9th-ranked
 
 - The output displays the results of all group stage matches by rounds, as well as the final group standings and the eight teams that advance to the knockout stage.
 
-
-
 ## Knockout Stage
 
 - Teams that qualify for the quarterfinals are placed into four pots:
 
-Pot D: Teams ranked 1 and 2,
-Pot E: Teams ranked 3 and 4,
-Pot F: Teams ranked 5 and 6,
-Pot G: Teams ranked 7 and 8.
+- Pot D: Teams ranked 1 and 2,
+- Pot E: Teams ranked 3 and 4,
+- Pot F: Teams ranked 5 and 6,
+- Pot G: Teams ranked 7 and 8.
 
 - Teams from Pot D are randomly matched with teams from Pot G, and teams from Pot E are matched with teams from Pot F to form the quarterfinal pairs. A key rule is that teams from the same group cannot meet in the quarterfinals.
 
 - At the same time, the pairs for the semifinals are drawn randomly, with the winners of Pot D and E crossing over with the winners of Pot F and G.
-
 
 ## Elimination Rounds
 
